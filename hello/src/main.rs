@@ -1,59 +1,52 @@
 use std::{
     io::{self, Read},
+    collections::{BTreeSet},
+    fmt::Write,
 };
 
 fn main() {
-    let mut buffer: String = String::new();
-    io::stdin().read_to_string(&mut buffer).unwrap();
-    let mut info = buffer
+    let mut buf: String = String::new();
+    io::stdin().read_to_string(&mut buf).unwrap();
+    let mut info = buf
         .split_ascii_whitespace()
         .map(|x| x.parse::<usize>().unwrap());
-    let test_cases: usize = info.next().unwrap();
-    for _ in 0..test_cases {
-        let (x, y, z) = (info.next().unwrap(), info.next().unwrap(), info.next().unwrap());
-        let mut sol: Solution = Solution { graph: vec![vec![0; y]; x], answer: 0 };
-        for _ in 0..z {
-            let (a, b) = (info.next().unwrap(), info.next().unwrap());
-            sol.graph[a][b] = 1;
-        }
-        sol.solve();
-        // for l in sol.graph {
-        //     println!("{:?}", l);
-        // }
-        println!("{}", sol.answer);
-    }
+    info.next().unwrap();
+    let pick: usize = info.next().unwrap();
+    let remove_repeat: BTreeSet<usize> = BTreeSet::from_iter(info);
+    let mut sol = Solution{
+        now: Vec::new(),
+        number_box: remove_repeat.into_iter().collect(),
+        pick: pick,
+    };
+    let mut answer: String = String::new();
+    sol.repeat_permutations(0, 0, &mut answer);
+    print!("{answer}");
+    
 }
+
+
 struct Solution {
-    graph: Vec<Vec<i32>>,
-    answer: usize
+    now: Vec<usize>,
+    number_box: Vec<usize>,
+    pick: usize,
 }
 
 impl Solution {
-    fn solve(&mut self) {
-        for i in 0..self.graph.len() {
-            for j in 0..self.graph[0].len() {
-                if self.graph[i][j] == 1 {
-                    self.dfs(i, j);
-                    self.answer += 1;
-                }
+    fn repeat_permutations(&mut self, start: usize, depth: usize, answer: &mut String) {
+        if depth == self.pick {
+            let mut output: String = String::with_capacity(self.pick * 2);
+            for c in &self.now {
+                output.push_str(&c.to_string());
+                output.push(' ');
             }
+            output.pop();
+            writeln!(answer, "{}", output).unwrap();
+            return ;
         }
-    }
-
-    fn dfs(&mut self, x: usize, y: usize) {
-        const DELTA: [(i32, i32); 4] = [(0, 1), (0, -1), (1, 0), (-1, 0)];
-        let mut stack: Vec<(usize, usize)> = Vec::with_capacity(4);
-        stack.push((x, y));
-        while !stack.is_empty() {
-            let (a, b) = stack.pop().unwrap();
-            for (k, w) in DELTA {
-                let na = a as i32 + k;
-                let nb = b as i32 + w;
-                if 0 <= na && na < self.graph.len() as i32 && 0 <= nb && nb < self.graph[0].len() as i32 && self.graph[na as usize][nb as usize] == 1 {
-                    self.graph[na as usize][nb as usize] = 0;
-                    stack.push((na as usize, nb as usize));
-                }
-            }
+        for i in start..self.number_box.len() {
+            self.now.push(self.number_box[i]);
+            self.repeat_permutations(i, depth+1, answer);
+            self.now.pop();
         }
     }
 }
