@@ -1,7 +1,6 @@
 use std::{
     io::{self, Read},
-    cmp::max,
-    collections::VecDeque,
+    collections::HashMap, cmp::max,
 };
 
 fn main() {
@@ -10,41 +9,28 @@ fn main() {
     let mut info = buf
         .split_ascii_whitespace()
         .map(|x| x.parse::<usize>().unwrap());
-    let list_length = info.next().unwrap();
-    let can_remove_count = info.next().unwrap();
-    let mut use_remove_count = can_remove_count;
-    let list: Vec<usize> = info.collect();
-    let mut tmp_list: VecDeque<usize> = VecDeque::new();
-    let mut now: usize = 0;
+    let length: usize = info.next().unwrap();
+    let limit_of_repeat: usize = info.next().unwrap();
+    let mut counter: HashMap<usize, usize> = HashMap::new();
+    let mut start: usize = 0;
     let mut answer: usize = 0;
-
-    while now < list_length {
-        if is_even(list[now]) {
-                tmp_list.push_back(list[now]);
-                answer = max(answer, tmp_list.len() - (can_remove_count - use_remove_count));
-                now += 1;
+    let info: Vec<usize> = info.collect();
+    for (end, now) in info.iter().enumerate() {
+        let now_count = counter.entry(*now).or_insert(0);
+        *now_count += 1;
+        if *now_count <= limit_of_repeat {
+            answer = max(answer, end - start + 1);
         } else {
-            if use_remove_count > 0 {
-                tmp_list.push_back(list[now]);
-                use_remove_count -= 1;
-                now += 1;
-            } else {
-                while !tmp_list.is_empty() {
-                    if !is_even(tmp_list.pop_front().unwrap()) {
-                        use_remove_count += 1;
-                        break ;
-                    }
-                }
+            while *counter.get(&now).unwrap() > limit_of_repeat {
+                *counter.get_mut(&info[start]).unwrap() -= 1;
+                start += 1;
             }
         }
-    }
-    print!("{answer}");
-}
 
-
-fn is_even(n: usize) -> bool {
-    match n % 2{
-        0 => true,
-        _ => false,
+        if length - start <= answer {
+            break ;
+        }
     }
+s
+    println!("{answer}");
 }
