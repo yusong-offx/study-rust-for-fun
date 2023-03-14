@@ -1,5 +1,3 @@
-
-
 pub fn reverse_string(s: &mut Vec<char>) {
     let (mut start, mut end) = (0, s.len()-1);
     let mut tmp = s[start];
@@ -10,10 +8,4 @@ pub fn reverse_string(s: &mut Vec<char>) {
         start += 1;
         end -= 1;
     }
-}
-
-fn main() {
-    let mut s: Vec<char> = vec!["h","e","l","l","o"];
-
-    reverse_string(&mut s)
 }
