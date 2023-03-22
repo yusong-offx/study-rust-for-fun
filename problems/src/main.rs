@@ -1,51 +1,26 @@
-
 struct Solution;
 
-#[derive(PartialEq, Eq, Clone, Debug)]
-pub struct ListNode {
-  pub val: i32,
-  pub next: Option<Box<ListNode>>
-}
-
-impl ListNode {
-  #[inline]
-  fn new(val: i32) -> Self {
-    ListNode {
-      next: None,
-      val
-    }
-  }
-}
 impl Solution {
-    pub fn remove_nth_from_end(head: Option<Box<ListNode>>, n: i32) -> Option<Box<ListNode>> {
-        let mut front = Vec::new();
-        let mut head = head;
-        let mut i = 0;
-        while let Some(now) = head {
-            front.push(Box::new(ListNode::new(now.val)));
-            head = now.next;
-            i += 1;
+    fn recur(open_bracket: i32, close_bracket: i32, buf: &mut Vec<char>, answer: &mut Vec<String>) {
+        if open_bracket == 0 && close_bracket == 0 {
+            answer.push(buf.iter().collect::<String>());
+            return
         }
-
-        front.remove((i - n) as usize);
-
-        let mut new_head = None;
-        while !front.is_empty() {
-            let mut now = front.pop().unwrap();
-            now.next = new_head;
-            new_head = Some(now);
+        if 0 < open_bracket {
+            buf.push('(');
+            Self::recur(open_bracket-1, close_bracket, buf, answer);
+            buf.pop();
         }
-        new_head
+        if open_bracket < close_bracket {
+            buf.push(')');
+            Self::recur(open_bracket, close_bracket-1, buf, answer);
+            buf.pop();
+        }
     }
-}
 
-fn main() {
-    let head = Some(
-        Box::new(ListNode{
-            val : 1,
-            next : Some(Box::new(
-                ListNode { val: 2, next: None }
-            ))
-    }));
-    Solution::remove_nth_from_end(head, 1);
+    pub fn generate_parenthesis(n: i32) -> Vec<String> {
+        let mut answer = Vec::new();
+        Self::recur(n, n, &mut Vec::new() , &mut answer);
+        answer
+    }
 }
