@@ -1,26 +1,38 @@
+use std::collections::BTreeSet;
+
 struct Solution;
 
 impl Solution {
-    fn recur(open_bracket: i32, close_bracket: i32, buf: &mut Vec<char>, answer: &mut Vec<String>) {
-        if open_bracket == 0 && close_bracket == 0 {
-            answer.push(buf.iter().collect::<String>());
-            return
+    pub fn first_missing_positive(nums: Vec<i32>) -> i32 {
+        let mut num = BTreeSet::new();
+        for i in nums {
+            if i > 0 {
+                num.insert(i);
+            }
         }
-        if 0 < open_bracket {
-            buf.push('(');
-            Self::recur(open_bracket-1, close_bracket, buf, answer);
-            buf.pop();
+        let mut checker: Vec<&i32> = Vec::with_capacity(num.len());
+        for x in num.iter() {
+            checker.push(x);
         }
-        if open_bracket < close_bracket {
-            buf.push(')');
-            Self::recur(open_bracket, close_bracket-1, buf, answer);
-            buf.pop();
+        let mut answer = 1;
+        for i in 0..num.len() {
+           if *checker[i] != answer {
+                return answer
+           }
+           answer += 1;
         }
-    }
-
-    pub fn generate_parenthesis(n: i32) -> Vec<String> {
-        let mut answer = Vec::new();
-        Self::recur(n, n, &mut Vec::new() , &mut answer);
         answer
+        // for i in 1..=num.len() {
+        //     let i = i as i32;
+        //     if !num.contains(&i) {
+        //         return i
+        //     }
+        // }
+        // (num.len()+1) as i32
     }
+}
+
+fn main() {
+    println!("{}", Solution::first_missing_positive(vec![1,2,2,1,3,1,0,4,0]));
+    println!("{}", Solution::first_missing_positive(vec![3,4,-1,1]));
 }
