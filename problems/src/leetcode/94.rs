@@ -16,31 +16,22 @@ impl TreeNode {
     }
   }
 }
-
 use std::rc::Rc;
 use std::cell::RefCell;
 
 impl Solution {
-    pub fn is_valid_bst(root: Option<Rc<RefCell<TreeNode>>>) -> bool {
-        let mut stack = vec![(root.unwrap(), i64::MIN, i64::MAX)];
-        while !stack.is_empty() {
-            let (now, low, high) = stack.pop().unwrap();
-
-            let now = now.borrow();
-            let val = now.val as i64;
-            if val <= low || val >= high{
-                return false
-            }
-            if let Some(left) = now.left.clone() {
-                stack.push((left, low, val));
-                
-            }
-            if let Some(right) = now.right.clone(){
-                stack.push((right, val, high));
-            }
-            
+    fn inorder(node: &Option<Rc<RefCell<TreeNode>>>, order: &mut Vec<i32>) {
+        if let Some(refcell_now) = node {
+            let now = refcell_now.borrow();
+            Self::inorder(&now.left, order);
+            order.push(now.val);
+            Self::inorder(&now.right, order);
         }
+    }
 
-        true
+    pub fn inorder_traversal(root: Option<Rc<RefCell<TreeNode>>>) -> Vec<i32> {
+        let mut answer = Vec::new();
+        Self::inorder(&root, &mut answer);
+        answer
     }
 }
