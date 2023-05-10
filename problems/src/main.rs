@@ -1,27 +1,22 @@
-// Definition for a binary tree node.
-#[derive(Debug, PartialEq, Eq)]
-pub struct TreeNode {
-  pub val: i32,
-  pub left: Option<Rc<RefCell<TreeNode>>>,
-  pub right: Option<Rc<RefCell<TreeNode>>>,
-}
-
-impl TreeNode {
-  #[inline]
-  pub fn new(val: i32) -> Self {
-    TreeNode {
-      val,
-      left: None,
-      right: None
-    }
-  }
-}
-
-use std::rc::Rc;
-use std::cell::RefCell;
-
 impl Solution {
-    pub fn sorted_array_to_bst(nums: Vec<i32>) -> Option<Rc<RefCell<TreeNode>>> {
-        
+    pub fn reverse_bits(x: u32) -> u32 {
+        let mut b: Vec<char> = format!("{:032b}", x).chars().collect();
+        let l = b.len();
+        for i in 0..l/2 {
+            let tmp = b[l-1-i];
+            b[l-1-i] = b[i];
+            b[i] = tmp;
+        }
+        let mut new_b = String::with_capacity(l);
+        for c in b {
+            new_b.push(c);
+        }
+        u32::from_str_radix(&new_b, 2).unwrap() 
     }
 }
+
+// fn main() {
+//     let a: u32 = 24;
+//     let b = format!("{:032b}", a);
+//     println!("{b}");
+// }
